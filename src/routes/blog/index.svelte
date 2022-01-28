@@ -3,7 +3,7 @@
 		const _url = new URL(url);
 		const page = _url.searchParams.get('page') ?? 1;
 		const page_size = _url.searchParams.get('page_size') ?? 2;
-		const posts = await fetch(`/api/${page}-${page_size}.json`);
+		const posts = await fetch(`/api/posts-${page}-${page_size}.json`);
 		const { list, total } = await posts.json();
 
 		return {
