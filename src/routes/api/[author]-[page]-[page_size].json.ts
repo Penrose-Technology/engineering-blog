@@ -1,7 +1,8 @@
-import { getAllPosts } from '../../util';
+import { getAllPosts } from '../../post';
 
 export const get = async ({ params }) => {
 	const { author, page, page_size } = params;
+
 	const posts = await getAllPosts();
 	const user_posts = posts.filter(({ user }) => user === author);
 

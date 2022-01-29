@@ -2,7 +2,7 @@
 	export const load = async ({ fetch, url, params }) => {
 		const _url = new URL(url);
 		const page = _url.searchParams.get('page') ?? 1;
-		const page_size = _url.searchParams.get('page_size') ?? 2;
+		const page_size = _url.searchParams.get('page_size') ?? 15;
 		const author = params.slug.slice(1);
 		const posts = await fetch(`/api/${author}-${page}-${page_size}.json`);
 		const { list, total } = await posts.json();

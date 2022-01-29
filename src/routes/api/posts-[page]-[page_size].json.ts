@@ -1,9 +1,8 @@
-import { getAllPosts } from '../../util';
+import { getAllPosts } from '../../post';
 
 export const get = async ({ params }) => {
 	const { page, page_size } = params;
 	const posts = await getAllPosts();
-
 	const list = posts.slice((+page - 1) * +page_size, (+page - 1) * +page_size + +page_size);
 
 	return {

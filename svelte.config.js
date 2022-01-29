@@ -1,6 +1,7 @@
-import adapter from '@sveltejs/adapter-auto';
+import path from 'path'
 import preprocess from 'svelte-preprocess';
-import { mdsvex } from 'mdsvex'
+import { mdsvex } from 'mdsvex';
+import adapter from '@sveltejs/adapter-auto';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -16,18 +17,20 @@ const config = {
 		}
 	},
 
-	extensions: ['.svelte', '.md', '.svx'],
 	// Consult https://github.com/sveltejs/svelte-preprocess
 	// for more information about preprocessors
 	preprocess: [
-		preprocess(),
 		mdsvex({
 			extensions: ['.svx', '.md'],
 			layout: {
-				blog: 'src/routes/_post.svelte'
+				blog: path.resolve('./src/routes/_post.svelte')
 			}
-		})
+		}),
+		preprocess({
+			postcss: true
+		}),
 	],
+	extensions: ['.svelte', '.md', '.svx'],
 };
 
 export default config;
