@@ -73,11 +73,11 @@ export const getPosts = async ({ url, user }: Params = {}): Promise<{
 			const to = /(\/posts.*)\.md$/.exec(path)[1];
 			const [u] = path.split(/\//).slice(-2, -1);
 
-			let avatar =
-				avatars.find((name) => new RegExp(`${u}\\.jpe?g|\\.png|\\.webp$`).exec(name)) ?? '';
+			const reg = new RegExp(`${u}\\.(?:jpe?g|png|webp|svg)$`);
+			let avatar = avatars.find((name) => reg.test(name)) ?? '';
 
 			if (avatar) {
-				avatar = new RegExp(`(${u}\\.jpe?g|\\.png|\\.webp)$`).exec(avatar)[1];
+				avatar = reg.exec(avatar)[0];
 			}
 
 			try {
@@ -104,7 +104,7 @@ export const getPosts = async ({ url, user }: Params = {}): Promise<{
 				}
 
 				summary =
-					summary.slice(0, SUMMARY_LEN).replace(/\s/g, '') +
+					summary.slice(0, SUMMARY_LEN).replace(/^\s+/m, '') +
 					(content.length < SUMMARY_LEN ? '' : '...');
 
 				return {
