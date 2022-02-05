@@ -6,7 +6,9 @@ import { mdsvex } from 'mdsvex';
 const config = {
 	extensions: ['.svelte', '.md'],
 	preprocess: [
-		preprocess(),
+		preprocess({
+			postcss: true
+		}),
 		mdsvex({
 			extension: '.md',
 			layout: 'src/lib/_post.svelte'

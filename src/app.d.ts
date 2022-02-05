@@ -9,5 +9,8 @@ declare namespace App {
 
 	interface Session {}
 
-	interface Stuff {}
+	interface Stuff {
+		tags: string[];
+		categorys: string[];
+	}
 }

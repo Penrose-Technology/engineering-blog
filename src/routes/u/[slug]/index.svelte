@@ -3,11 +3,9 @@
 </script>
 
 <script lang="ts">
-	export let list: any[];
+	import List from '$lib/list.svelte';
+	import type { Post } from '$lib/post';
+	export let list: Post[];
 </script>
 
-{#each list as item}
-	<div>
-		<a href={item.to}>{item.title}</a>
-	</div>
-{/each}
+<List {list} />

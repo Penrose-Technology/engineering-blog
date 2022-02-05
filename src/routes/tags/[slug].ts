@@ -1,8 +1,8 @@
 import { getPosts } from '$lib/post';
 
 export async function get({ url }) {
-	const ret = await getPosts({ url });
+	const { tag_map } = await getPosts({ url });
 	return {
-		body: { list: ret.list }
+		body: { tag_map }
 	};
 }

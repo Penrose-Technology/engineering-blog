@@ -3,9 +3,12 @@
 </script>
 
 <script lang="ts">
+	import { page } from '$app/stores';
 	import List from '$lib/list.svelte';
-	import type { Post } from '$lib/post';
-	export let list: Post[];
+	import type { TagMap } from '$lib/post';
+
+	export let tag_map: TagMap;
+	$: list = tag_map[$page.params.slug];
 </script>
 
 <List {list} />
