@@ -1,6 +1,6 @@
 import { getPosts } from '$lib/post';
 
-export async function get() {
+export async function get({ url }) {
 	const ret = await getPosts();
 	return {
 		body: {

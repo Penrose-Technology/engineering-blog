@@ -5,10 +5,19 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import List from '$lib/list.svelte';
-	import type { TagMap } from '$lib/post';
+	import Pagin from '$lib/pagin.svelte';
+	import type { Post, TagMap } from '$lib/post';
 
 	export let tag_map: TagMap;
-	$: list = tag_map[$page.params.slug];
+	let list: Post[];
+	let total: number;
+	$: {
+		list = tag_map[$page.params.slug].list;
+		total = tag_map[$page.params.slug].total;
+	}
 </script>
 
-<List {list} />
+{#if list}
+	<List {list} />
+	<Pagin {total} />
+{/if}
