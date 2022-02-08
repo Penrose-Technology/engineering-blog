@@ -49,16 +49,19 @@ class PageConfig {
 	}
 }
 
-export type TagMap = { [x: string]: Post[] };
+export type TagMap = { [x: string]: { list: Post[]; total: number } };
 
-export const getPosts = async ({ url, user }: Params = {}): Promise<{
-	list: Post[];
-	categorys: string[];
-	tags: string[];
-	tag_map: TagMap;
-	cate_map: TagMap;
-}> => {
-	const page_config = url ? PageConfig.create(url) : null;
+export const getPosts = async ({ url, user }: Params = {}): Promise<
+	{
+		list: Post[];
+		categorys: string[];
+		tags: string[];
+		tag_map: TagMap;
+		cate_map: TagMap;
+		total: number;
+	} & Page_Config
+> => {
+	const page_config = url ? PageConfig.create(url) : { page: PAGE_FROM, page_size: PAGE_SIZE };
 
 	const avatars = Object.keys(import.meta.glob('../../static/avatars/*'));
 
@@ -162,43 +165,47 @@ export const getPosts = async ({ url, user }: Params = {}): Promise<{
 		// @ts-ignore
 		.sort((a, b) => new Date(b.date) - new Date(a.date));
 
+	const total = list.length;
+
 	let cate_map = {};
 	let tag_map = {};
 
-	if (page_config) {
-		tag_map = tags.reduce(
-			(prev, cur) => ({
-				...prev,
-				[cur]: list
+	tag_map = tags.reduce(
+		(prev, cur) => ({
+			...prev,
+			[cur]: {
+				list: list
 					.filter(({ tags: t }) => t.includes(cur))
 					.slice(
 						(page_config.page - 1) * page_config.page_size,
 						(page_config.page - 1) * page_config.page_size + page_config.page_size
-					)
-			}),
-			{}
-		);
-		cate_map = categorys.reduce(
-			(prev, cur) => ({
-				...prev,
-				[cur]: list
+					),
+				total: list.filter(({ tags: t }) => t.includes(cur)).length
+			}
+		}),
+		{}
+	);
+	cate_map = categorys.reduce(
+		(prev, cur) => ({
+			...prev,
+			[cur]: {
+				list: list
 					.filter(({ category: cate }) => cate.includes(cur))
 					.slice(
 						(page_config.page - 1) * page_config.page_size,
 						(page_config.page - 1) * page_config.page_size + page_config.page_size
-					)
-			}),
-			{}
-		);
-	}
+					),
+				length: list.filter(({ category: cate }) => cate.includes(cur)).length
+			}
+		}),
+		{}
+	);
 
-	if (page_config) {
-		// pagin
-		list = list.slice(
-			(page_config.page - 1) * page_config.page_size,
-			(page_config.page - 1) * page_config.page_size + page_config.page_size
-		);
-	}
+	// pagin
+	list = list.slice(
+		(page_config.page - 1) * page_config.page_size,
+		(page_config.page - 1) * page_config.page_size + page_config.page_size
+	);
 
-	return { list, categorys, tags, cate_map, tag_map };
+	return { total, list, categorys, tags, cate_map, tag_map, ...page_config };
 };
