@@ -1,9 +1,12 @@
 <script context="module">
 	export const load = async ({ fetch }) => {
-		const ret = await fetch('/api/meta');
-		const data = await ret.json();
+		const ret = await fetch('/api/posts');
+		const { tags, categorys } = await ret.json();
 		return {
-			stuff: data
+			stuff: {
+				tags,
+				categorys
+			}
 		};
 	};
 </script>

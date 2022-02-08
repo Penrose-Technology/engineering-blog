@@ -1,14 +1,10 @@
-<script context="module">
-	export const prerender = true;
-</script>
-
 <script>
+	import 'github-markdown-css/github-markdown-light.css';
+	import 'prism-themes/themes/prism-vsc-dark-plus.min.css';
 	import { showTitle } from '$lib/store';
 	import { onDestroy, onMount } from 'svelte';
-	import { formatDate } from './util';
 
 	export let title;
-	export let date;
 
 	let observer;
 	let wrap;
@@ -30,11 +26,10 @@
 </script>
 
 <div>
-	<h1 bind:this={wrap} class="flex justify-center py-4 items-center flex-col mb-2">
+	<h1 bind:this={wrap} class="py-4 mb-2 mt-8">
 		<span class="font-semibold text-2xl">{title}</span>
-		<em class="text-sm opacity-70 mt-2">{formatDate(date)}</em>
 	</h1>
-	<div class="content">
+	<div class="content markdown-body">
 		<slot />
 	</div>
 </div>

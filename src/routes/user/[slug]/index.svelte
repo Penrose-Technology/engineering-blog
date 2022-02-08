@@ -1,15 +1,16 @@
 <script context="module">
-	export const prerender = true;
-
 	import { paged, getPageParamsFromUrl } from '$lib/util';
 
-	export const load = async ({ fetch, url }) => {
+	export const load = async ({ fetch, url, params: { slug } }) => {
 		const r1 = await fetch('/api/posts' + new URL(url).search);
 		const data = await r1.json();
-		const params = getPageParamsFromUrl(new URL(url));
 
-		const list = paged(
-			data.list
+		const params = getPageParamsFromUrl(new URL(url));
+		let list = data.list.filter((item) => item.u === slug);
+		const total = list.length;
+
+		list = paged(
+			list
 				.map((item) => {
 					const { hash, ...others } = data.times[item.id];
 					return {
@@ -20,10 +21,11 @@
 				.sort((a, b) => b.updated_at - a.updated_at),
 			params
 		);
+
 		return {
 			props: {
 				list,
-				total: data.total,
+				total,
 				...params
 			}
 		};
@@ -39,5 +41,4 @@
 </script>
 
 <List {list} />
-
 <Pagin {total} />

@@ -1,6 +1,10 @@
+<script context="module">
+	export const prerender = true;
+</script>
+
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { PAGE_FROM, PAGE_SIZE } from '$lib/post.config';
+	import { getPageParamsFromUrl } from '$lib/util';
 
 	let url: URL;
 	let index = -1;
@@ -13,8 +17,9 @@
 		if (nav) {
 			url = new URL($page.url);
 
-			p = url.searchParams.get('page') ?? PAGE_FROM;
-			page_size = url.searchParams.get('page_size') ?? PAGE_SIZE;
+			const params = getPageParamsFromUrl(url);
+			p = params.page;
+			page_size = params.page_size;
 
 			if (/about\/?$/.test(url.pathname)) {
 				index = 1;
@@ -45,15 +50,17 @@
 </div>
 
 <nav bind:this={nav} class="flex py-4 border-b relative mb-8">
-	<a href="/u/{$page.params.slug}?page_size={page_size}&page={p}" class:active={index === 0}>Home</a
+	<a href="/user/{$page.params.slug}?page_size={page_size}&page={p}" class:active={index === 0}
+		>Home</a
 	>
 	<span class="mx-2">|</span>
-	<a href="/u/{$page.params.slug}/about?page_size={page_size}&page={p}" class:active={index === 1}
-		>About</a
+	<a
+		href="/user/{$page.params.slug}/about?page_size={page_size}&page={p}"
+		class:active={index === 1}>About</a
 	>
 
 	<div
-		class="bg-black absolute transform bottom-0 left-0 indicator transition-transform duration-300"
+		class="bg-black absolute transform bottom-0 left-0 indicator"
 		style="transform: translate3d({anchor_rect.x}px,0,0);width: {anchor_rect.w}px;"
 	/>
 </nav>
