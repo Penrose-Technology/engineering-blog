@@ -5,17 +5,19 @@
 </script>
 
 {#if list}
-	{#each list as { u, avatar, date, to, title, summary, tags }}
+	{#each list as { u, avatar, updated_at, to, title, summary, tags }}
 		<div class="flex flex-col max-w-2xl item">
 			<div class="flex items-center py-4">
-				<a class="user flex items-center drop-shadow" href="/u/{u}">
+				<a class="user flex flex-initial flex-shrink-0 items-center drop-shadow" href="/user/{u}">
 					{#if avatar}
 						<i
 							style="background-image: url({avatar})"
 							class="bg-no-repeat bg-cover w-6 h-6 rounded-full"
 						/>
 					{:else}
-						<p class="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full">
+						<p
+							class="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full text-sm font-semibold"
+						>
 							{u[0].toUpperCase()}
 						</p>
 					{/if}
@@ -24,7 +26,7 @@
 
 				<p>
 					<i class="iconfont icon-dot text-xs font-semibold" />
-					<span class="text-sm opacity-75">{formatDate(date)}</span>
+					<span class="text-sm opacity-75">{formatDate(updated_at)}</span>
 				</p>
 			</div>
 			<a class="flex flex-col" href={to}>

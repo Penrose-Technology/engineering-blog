@@ -1,4 +1,4 @@
-import { PAGE_FROM, PAGE_SIZE, SUMMARY_LEN } from './post.config';
+import { SUMMARY_LEN } from './post.config';
 import { parseDocument } from 'htmlparser2';
 
 const noop = () => undefined;
@@ -9,7 +9,7 @@ enum PostState {
 }
 
 type Meta = {
-	date: string;
+	// date: string;
 	title: string;
 	state: PostState;
 	tags?: string;
@@ -19,50 +19,35 @@ type Meta = {
 type Params = {
 	url?: string;
 	user?: string;
-};
-
-type Page_Config = {
-	page: number;
-	page_size: number;
+	page?: number;
+	page_size?: number;
 };
 
 export type Post = {
+	id: string;
 	u: string;
+	name: string;
 	to: string;
 	avatar: string;
 	summary: string;
+	created_at: number;
+	updated_at: number;
 } & Meta;
-
-const parseInt = (n: string) => Number.parseInt(n, 10);
-
-class PageConfig {
-	static create(url: string): Page_Config {
-		const _url = new URL(url);
-		const _params = _url.searchParams;
-		const page = _params.get('page');
-		const page_size = _params.get('page_size');
-
-		return {
-			page: page ? parseInt(page) : PAGE_FROM,
-			page_size: page_size ? parseInt(page_size) : PAGE_SIZE
-		};
-	}
-}
 
 export type TagMap = { [x: string]: { list: Post[]; total: number } };
 
-export const getPosts = async ({ url, user }: Params = {}): Promise<
-	{
-		list: Post[];
-		categorys: string[];
-		tags: string[];
-		tag_map: TagMap;
-		cate_map: TagMap;
-		total: number;
-	} & Page_Config
-> => {
-	const page_config = url ? PageConfig.create(url) : { page: PAGE_FROM, page_size: PAGE_SIZE };
+const createPostId = (to: string) => to.slice(7);
 
+export const getPosts = async (): Promise<{
+	list: Post[];
+	categorys: string[];
+	tags: string[];
+	users: Record<string, Record<'avatar', string>>;
+	tag_map: TagMap;
+	cate_map: TagMap;
+	total: number;
+	files: string[];
+}> => {
 	const avatars = Object.keys(import.meta.glob('../../static/avatars/*'));
 
 	const ret = import.meta.glob('../routes/posts/**/*.md') as Record<
@@ -75,6 +60,7 @@ export const getPosts = async ({ url, user }: Params = {}): Promise<
 		iterablePostFiles.map(async ([path, resolver]) => {
 			const to = /(\/posts.*)\.md$/.exec(path)[1];
 			const [u] = path.split(/\//).slice(-2, -1);
+			const name = to.split(/\//).pop();
 
 			const reg = new RegExp(`${u}\\.(?:jpe?g|png|webp|svg)$`);
 			let avatar = avatars.find((name) => reg.test(name)) ?? '';
@@ -89,33 +75,37 @@ export const getPosts = async ({ url, user }: Params = {}): Promise<
 				const content = args.default
 					// @ts-ignore
 					.render()
-					.html.split('<div class="content">')[1] as string;
+					.html.split('<div class="content markdown-body">')[1] as string;
 
 				let summary = '';
-				const list = parseDocument(content);
-				for (const item of list?.children) {
-					// @ts-ignore
-					if (item.name === 'p') {
-						// @ts-ignore
-						if (item.children?.[0]?.type === 'text') {
-							// @ts-ignore
-							summary += item.children[0].data;
+				const apppendSummary = (node: any) => {
+					if (node.children) {
+						for (let item of node.children) {
+							if (item.type === 'text') {
+								summary += item.data;
+								if (summary.length >= SUMMARY_LEN) return;
+							} else {
+								apppendSummary(item);
+							}
 						}
-
-						if (summary.length >= SUMMARY_LEN) break;
 					}
-				}
+				};
+				apppendSummary(parseDocument(content));
 
 				summary =
 					summary.slice(0, SUMMARY_LEN).replace(/^\s+/m, '') +
 					(content.length < SUMMARY_LEN ? '' : '...');
 
+				const id = createPostId(to);
+
 				return {
+					id,
 					...metadata,
 					tags: metadata.tags?.split(/\s+/) ?? [],
 					category: metadata.category?.split(/\s+/) ?? [],
 					to,
 					u,
+					name,
 					avatar: avatar && `/avatars/${avatar}`,
 					summary
 				};
@@ -132,9 +122,9 @@ export const getPosts = async ({ url, user }: Params = {}): Promise<
 		list = list.filter(({ state }) => state === PostState.STABLE);
 	}
 
-	list = list.filter(({ title, date, state }) => Boolean(title && date && state));
+	list = list.filter(({ title, state }) => Boolean(title && state));
 
-	const { categorys, tags } = list.reduce(
+	const { categorys, tags, users } = list.reduce(
 		(prev, cur) => {
 			if (cur.category) {
 				cur.category.forEach((cate) => {
@@ -152,60 +142,47 @@ export const getPosts = async ({ url, user }: Params = {}): Promise<
 				});
 			}
 
+			prev.users[cur.u] = {
+				...(prev.users[cur.u] ?? {}),
+				avatar: cur.avatar
+			};
+
 			return { ...prev };
 		},
-		{ categorys: [], tags: [] }
+		{ categorys: [], tags: [], users: {} }
 	);
-
-	if (user) {
-		list = list.filter(({ u }) => u === user);
-	}
-
-	list = list
-		// @ts-ignore
-		.sort((a, b) => new Date(b.date) - new Date(a.date));
 
 	const total = list.length;
 
 	let cate_map = {};
 	let tag_map = {};
 
-	tag_map = tags.reduce(
-		(prev, cur) => ({
-			...prev,
-			[cur]: {
-				list: list
-					.filter(({ tags: t }) => t.includes(cur))
-					.slice(
-						(page_config.page - 1) * page_config.page_size,
-						(page_config.page - 1) * page_config.page_size + page_config.page_size
-					),
-				total: list.filter(({ tags: t }) => t.includes(cur)).length
-			}
-		}),
-		{}
-	);
-	cate_map = categorys.reduce(
-		(prev, cur) => ({
-			...prev,
-			[cur]: {
-				list: list
-					.filter(({ category: cate }) => cate.includes(cur))
-					.slice(
-						(page_config.page - 1) * page_config.page_size,
-						(page_config.page - 1) * page_config.page_size + page_config.page_size
-					),
-				length: list.filter(({ category: cate }) => cate.includes(cur)).length
-			}
-		}),
-		{}
-	);
+	const groupPagesByCates = (cates: string[], cates_key: string) => {
+		return cates.reduce((prev, cur) => {
+			const filtered = list.filter((item) => item[cates_key].includes(cur));
+			const total = filtered.length;
+			return {
+				...prev,
+				[cur]: {
+					list: filtered,
+					total
+				}
+			};
+		}, {});
+	};
 
-	// pagin
-	list = list.slice(
-		(page_config.page - 1) * page_config.page_size,
-		(page_config.page - 1) * page_config.page_size + page_config.page_size
-	);
+	tag_map = groupPagesByCates(tags, 'tags');
+	cate_map = groupPagesByCates(categorys, 'category');
 
-	return { total, list, categorys, tags, cate_map, tag_map, ...page_config };
+	return {
+		total,
+		list,
+		categorys,
+		tags,
+		cate_map,
+		tag_map,
+		users,
+
+		files: Object.keys(ret).map((c) => './src' + c.slice(2))
+	};
 };

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount, tick } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { menus } from './head.config';
 	import { env, showTitle } from './store';
 	import { fade } from 'svelte/transition';
@@ -8,7 +8,6 @@
 	let observer: IntersectionObserver;
 	let indicator: HTMLDivElement;
 	let showBorder = false;
-	let cateEl: HTMLLIElement;
 
 	onMount(() => {
 		observer = new IntersectionObserver(
@@ -56,7 +55,7 @@
 			</a>
 		{/each}
 		<ul class="ml-auto">
-			<li bind:this={cateEl} class="relative cate cursor-pointer" on:click={showCates}>
+			<li class="relative cate cursor-pointer" on:click={showCates}>
 				分类
 				<ul
 					class:show-cates={show_cates}
