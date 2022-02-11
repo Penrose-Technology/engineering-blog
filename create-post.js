@@ -13,6 +13,8 @@ state: 2
 This is A Demo.
 `;
 
+const intro_tpl = () => '空空如也~';
+
 const props = ['作者', '标题', '文件名'].map(
 	(n) => () =>
 		prompts({
@@ -41,10 +43,15 @@ const values = [];
 	log(chalk.cyan('   创建中...'));
 	const dir = path.resolve(`./src/routes/posts/${values[0]}`);
 	const file = path.resolve(dir, `${values[2]}.md`);
+	const intro = path.resolve(`./src/routes/users/${values[0]}.md`);
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir);
 	}
 	fs.writeFileSync(file, tpl(values[1]), 'utf-8');
+
+	if (!fs.existsSync(intro)) {
+		fs.writeFileSync(intro, intro_tpl(), 'utf-8');
+	}
 	console.clear();
 	log();
 	log(chalk.cyan('   创建成功.'));
