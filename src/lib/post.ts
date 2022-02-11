@@ -1,4 +1,4 @@
-import { SUMMARY_LEN } from './post.config';
+import { SUMMARY_LEN, WORDS_PER_MIN } from './post.config';
 import { parseDocument } from 'htmlparser2';
 
 const noop = () => undefined;
@@ -16,13 +16,6 @@ type Meta = {
 	category?: string;
 };
 
-type Params = {
-	url?: string;
-	user?: string;
-	page?: number;
-	page_size?: number;
-};
-
 export type Post = {
 	id: string;
 	u: string;
@@ -32,6 +25,7 @@ export type Post = {
 	summary: string;
 	created_at: number;
 	updated_at: number;
+	min: number;
 } & Meta;
 
 export type TagMap = { [x: string]: { list: Post[]; total: number } };
@@ -75,24 +69,45 @@ export const getPosts = async (): Promise<{
 					.render()
 					.html.split('<div class="content markdown-body">')[1] as string;
 
-				let summary = '';
+				let all_content = '';
+
 				const apppendSummary = (node: any) => {
 					if (node.children) {
 						for (let item of node.children) {
 							if (item.type === 'text') {
-								summary += item.data;
-								if (summary.length >= SUMMARY_LEN) return;
+								all_content += item.data;
+								// if (summary.length >= SUMMARY_LEN) return;
 							} else {
 								apppendSummary(item);
 							}
 						}
 					}
 				};
+
 				apppendSummary(parseDocument(content));
 
-				summary =
-					summary.slice(0, SUMMARY_LEN).replace(/^\s+/m, '') +
-					(content.length < SUMMARY_LEN ? '' : '...');
+				const counts = (() => {
+					const words = all_content.split(/\s+/);
+					let c = 0;
+					for (const w of words) {
+						if (/[\u4E00-\u9FA5]+/.test(w)) {
+							for (const v of w) {
+								if (v.trim()) {
+									c++;
+								}
+							}
+						} else {
+							if (w.trim()) {
+								c++;
+							}
+						}
+					}
+					return c;
+				})();
+
+				const summary =
+					all_content.slice(0, SUMMARY_LEN) +
+					(all_content.length > SUMMARY_LEN ? '...' : '').replace(/^\s+/m, '');
 
 				const id = createPostId(to);
 
@@ -105,7 +120,8 @@ export const getPosts = async (): Promise<{
 					u,
 					name,
 					avatar: avatar && `/avatars/${avatar}`,
-					summary
+					summary,
+					min: Math.max(1, Math.ceil(counts / WORDS_PER_MIN))
 				};
 			} catch (e) {
 				//
@@ -142,7 +158,8 @@ export const getPosts = async (): Promise<{
 
 			prev.users[cur.u] = {
 				...(prev.users[cur.u] ?? {}),
-				avatar: cur.avatar
+				avatar: cur.avatar,
+				min: cur.min
 			};
 
 			return { ...prev };
