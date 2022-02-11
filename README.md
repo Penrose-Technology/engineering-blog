@@ -39,6 +39,19 @@ category: (category, 多个category使用空格分开, 选填)
 This is A Demo.
 ```
 
+## Avatar
+
+在项目根目录下，进入 `static/avatars`目录，在这个目录里添加以作者名字命名的头像文件：比如`张三.jpg`,目前头像文件格式支持：
+
+ - jpg(jpeg)
+ - png
+ - webp
+ - svg
+
+## User About Page
+
+使用`pnpm new`命令创建的博客，会自动检查是否有about页面，如果没有，会自动在目录：`src/routes/users/`下创建以作者名字命名的markdown文件，比如 `张三.md`，也可以自行在目录里添加这个文档。这个文档里可以添加作者的自我介绍。
+
 ## Building
 
 To create a production version of your app:
