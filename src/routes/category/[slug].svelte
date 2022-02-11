@@ -23,10 +23,15 @@
 	import List from '$lib/list.svelte';
 	import Pagin from '$lib/pagin.svelte';
 	import type { Post } from '$lib/post';
+	import { page } from '$app/stores';
 
 	export let list: Post[];
 	export let total: number;
 </script>
+
+<div class="text-4xl font-bold py-5 mb-4 border-b">
+	{$page.params.slug}
+</div>
 
 {#if list}
 	<List {list} />
