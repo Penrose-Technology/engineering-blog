@@ -43,8 +43,6 @@ export const getPosts = async (): Promise<{
 	categorys: string[];
 	tags: string[];
 	users: Record<string, Record<'avatar', string>>;
-	tag_map: TagMap;
-	cate_map: TagMap;
 	total: number;
 	files: string[];
 }> => {
@@ -154,35 +152,12 @@ export const getPosts = async (): Promise<{
 
 	const total = list.length;
 
-	let cate_map = {};
-	let tag_map = {};
-
-	const groupPagesByCates = (cates: string[], cates_key: string) => {
-		return cates.reduce((prev, cur) => {
-			const filtered = list.filter((item) => item[cates_key].includes(cur));
-			const total = filtered.length;
-			return {
-				...prev,
-				[cur]: {
-					list: filtered,
-					total
-				}
-			};
-		}, {});
-	};
-
-	tag_map = groupPagesByCates(tags, 'tags');
-	cate_map = groupPagesByCates(categorys, 'category');
-
 	return {
 		total,
 		list,
 		categorys,
 		tags,
-		cate_map,
-		tag_map,
 		users,
-
 		files: Object.keys(ret).map((c) => './src' + c.slice(2))
 	};
 };

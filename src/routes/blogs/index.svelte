@@ -1,31 +1,19 @@
 <script context="module">
 	export const prerender = true;
 
-	import { paged, getPageParamsFromUrl } from '$lib/util';
+	import { fetchData, getPageParamsFromUrl } from '$lib/util';
 
 	export const load = async ({ fetch, url }) => {
-		const r1 = await fetch('/api/posts' + new URL(url).search);
-		const data = await r1.json();
 		const params = getPageParamsFromUrl(new URL(url));
+		const slug = JSON.stringify({
+			list: 'all',
+			...params
+		});
 
-		const list = paged(
-			data.list
-				.map((item) => {
-					const { hash, ...others } = data.times[item.id];
-					return {
-						...item,
-						...others
-					};
-				})
-				.sort((a, b) => b.updated_at - a.updated_at),
-			params
-		);
+		const data = await fetchData(fetch, `/api/posts-${slug}`);
+
 		return {
-			props: {
-				list,
-				total: data.total,
-				...params
-			}
+			props: data
 		};
 	};
 </script>

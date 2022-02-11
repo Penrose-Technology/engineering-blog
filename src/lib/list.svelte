@@ -8,7 +8,11 @@
 	{#each list as { u, avatar, updated_at, to, title, summary, tags }}
 		<div class="flex flex-col max-w-2xl item">
 			<div class="flex items-center py-4">
-				<a class="user flex flex-initial flex-shrink-0 items-center drop-shadow" href="/user/{u}">
+				<a
+					sveltekit:prefetch
+					class="user flex flex-initial flex-shrink-0 items-center drop-shadow"
+					href="/user/{u}"
+				>
 					{#if avatar}
 						<i
 							style="background-image: url({avatar})"
@@ -29,11 +33,12 @@
 					<span class="text-sm opacity-75">{formatDate(updated_at)}</span>
 				</p>
 			</div>
-			<a class="flex flex-col" href={to}>
+			<a sveltekit:prefetch class="flex flex-col" href={to}>
 				<div class="font-semibold pb-2">{title}</div>
 				<div class="flex flex-wrap pb-2 -mx-1">
 					{#each tags as tag, i}
 						<a
+							sveltekit:prefetch
 							href="/tags/{tag}"
 							class:bg-red-300={i === 0}
 							class:bg-orange-300={i === 1}

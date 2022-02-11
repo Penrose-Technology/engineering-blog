@@ -50,7 +50,7 @@
 <header class="h-14 flex items-center justify-center" class:border-b={showBorder}>
 	<div class="px-4 flex items-center max-w-7xl w-full h-full relative">
 		{#each menus as menu}
-			<a href={menu.to}>
+			<a sveltekit:prefetch href={menu.to}>
 				<i class="iconfont icon-{menu.icon} text-2xl" />
 			</a>
 		{/each}
@@ -63,7 +63,11 @@
 				>
 					{#each $page.stuff.categorys as cate}
 						<li class="flex">
-							<a class="px-4 py-1 flex-1 hover:bg-gray-100" href="/category/{cate}">{cate}</a>
+							<a
+								sveltekit:prefetch
+								class="px-4 py-1 flex-1 hover:bg-gray-100"
+								href="/category/{cate}">{cate}</a
+							>
 						</li>
 					{/each}
 				</ul>

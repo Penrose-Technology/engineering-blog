@@ -1,7 +1,7 @@
 import { getPosts } from '$lib/post';
 import { create } from '$lib/create_time/create';
 
-export const get = async () => {
+export const get = async ({ url }) => {
 	const body = await getPosts();
 
 	let times;

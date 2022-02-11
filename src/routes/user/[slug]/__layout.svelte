@@ -50,8 +50,10 @@
 </div>
 
 <nav bind:this={nav} class="flex py-4 border-b relative mb-8">
-	<a href="/user/{$page.params.slug}?page_size={page_size}&page={p}" class:active={index === 0}
-		>Home</a
+	<a
+		sveltekit:prefetch
+		href="/user/{$page.params.slug}?page_size={page_size}&page={p}"
+		class:active={index === 0}>Home</a
 	>
 	<span class="mx-2">|</span>
 	<a

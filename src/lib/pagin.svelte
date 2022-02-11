@@ -22,15 +22,19 @@
 {#if has_prev || has_next}
 	<div class="flex items-center flex-1 justify-center py-8">
 		{#if p > 1}
-			<a href="?page=1&page_size={page_size}" class="mr-4">
+			<a sveltekit:prefetch href="?page=1&page_size={page_size}" class="mr-4">
 				<i class="iconfont icon-arrow-double-left" />
 			</a>
 		{/if}
-		<a class:disable={!has_prev} href="?page={p - 1}&page_size={page_size}">Prev</a>
+		<a sveltekit:prefetch class:disable={!has_prev} href="?page={p - 1}&page_size={page_size}"
+			>Prev</a
+		>
 		<span class="mx-4">|</span>
-		<a class:disable={!has_next} href="?page={p + 1}&page_size={page_size}">Next</a>
+		<a sveltekit:prefetch class:disable={!has_next} href="?page={p + 1}&page_size={page_size}"
+			>Next</a
+		>
 		{#if p < pages}
-			<a href="?page={pages}&page_size={page_size}" class="ml-4">
+			<a sveltekit:prefetch href="?page={pages}&page_size={page_size}" class="ml-4">
 				<i class="iconfont icon-arrow-double-right" />
 			</a>
 		{/if}
