@@ -27,23 +27,41 @@
 
 	onMount(() => {
 		const ua = window.navigator.userAgent;
-		const isIOS = /iphone os/i.test(ua);
+		const isIPhone = /iphone os/i.test(ua);
 		const isAndroid = /android/i.test(ua);
-		if (isIOS || isAndroid) {
+		const isIOS = /ipad|iphone|ipod/i.test(ua);
+		if (isIPhone || isAndroid) {
 			document.body.classList.add('is-mobile');
 		}
-		if (isIOS) {
-			document.body.classList.add('is-ios');
+		if (isIPhone) {
+			document.body.classList.add('is-iphone');
 		}
 		if (isAndroid) {
 			document.body.classList.add('is-android');
 		}
+		if (isIOS) {
+			document.body.classList.add('is-ios');
+		}
 
 		$env = {
+			isIPhone,
 			isIOS,
 			isAndroid,
 			isMobile: isIOS || isAndroid
 		};
+
+		if (isIOS) {
+			window.document.addEventListener(
+				'touchmove',
+				(e) => {
+					// @ts-ignore
+					if (e.scale !== 1) {
+						e.preventDefault();
+					}
+				},
+				{ passive: false }
+			);
+		}
 	});
 
 	$: if ($navigating) {
