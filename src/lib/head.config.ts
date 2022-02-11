@@ -4,4 +4,4 @@ type Menu = {
 	title?: string;
 };
 
-export let menus = [{ icon: 'home', to: '/blogs' }] as Menu[];
+export let menus = [{ icon: 'home', to: '/' }] as Menu[];

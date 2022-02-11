@@ -18,9 +18,12 @@
 
 <script>
 	import '../app.css';
+	import 'nprogress/nprogress.css';
+	import np from 'nprogress';
 	import Head from '$lib/head.svelte';
 	import { onMount } from 'svelte';
 	import { env } from '$lib/store';
+	import { navigating } from '$app/stores';
 
 	onMount(() => {
 		const ua = window.navigator.userAgent;
@@ -42,6 +45,12 @@
 			isMobile: isIOS || isAndroid
 		};
 	});
+
+	$: if ($navigating) {
+		np?.start();
+	} else {
+		np?.done();
+	}
 </script>
 
 <Head />
