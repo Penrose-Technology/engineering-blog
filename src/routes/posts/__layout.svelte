@@ -7,13 +7,12 @@
 		const slug = JSON.stringify({ user, detail: true, name });
 
 		const { users, times } = await fetchData(fetch, `/api/posts-${slug}`);
-		const { avatar } = users[user];
 		const time = times[[user, name].join('/')];
 
 		return {
 			props: {
 				user,
-				avatar,
+				...users[user],
 				...time
 			}
 		};
@@ -25,6 +24,7 @@
 
 	export let user: string;
 	export let avatar: string;
+	export let min: number;
 	export let updated_at: number;
 </script>
 
@@ -40,7 +40,11 @@
 	</a>
 	<div class="ml-2">
 		<a href="/user/{user}" class="hover:underline">{user}</a>
-		<div class="text-sm opacity-60 mt-1">{formatDate(updated_at)}</div>
+		<div class="flex items-center">
+			<span class="text-sm opacity-75">{formatDate(updated_at)}</span>
+			<i class="iconfont icon-dot text-xs font-semibold" />
+			<span class="text-sm opacity-75">{min} min read</span>
+		</div>
 	</div>
 </div>
 <slot />

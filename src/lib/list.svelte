@@ -5,7 +5,7 @@
 </script>
 
 {#if list}
-	{#each list as { u, avatar, updated_at, to, title, summary, tags }}
+	{#each list as { u, avatar, updated_at, to, title, summary, tags, min }}
 		<div class="flex flex-col max-w-2xl item">
 			<div class="flex items-center py-4">
 				<a
@@ -31,6 +31,8 @@
 				<p>
 					<i class="iconfont icon-dot text-xs font-semibold" />
 					<span class="text-sm opacity-75">{formatDate(updated_at)}</span>
+					<i class="iconfont icon-dot text-xs font-semibold" />
+					<span class="text-sm opacity-75">{min} min read</span>
 				</p>
 			</div>
 			<a sveltekit:prefetch class="flex flex-col" href={to}>
