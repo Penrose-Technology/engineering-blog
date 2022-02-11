@@ -1,11 +1,12 @@
 <script context="module">
 	export const prerender = true;
+	import { fetchData } from '$lib/util';
 
 	export const load = async ({ url, fetch }) => {
 		const [user, name] = new URL(url).pathname.split('/').slice(-2).map(decodeURIComponent);
-		const r1 = await fetch('/api/posts');
-		const { users, times } = await r1.json();
+		const slug = JSON.stringify({ user, detail: true, name });
 
+		const { users, times } = await fetchData(fetch, `/api/posts-${slug}`);
 		const { avatar } = users[user];
 		const time = times[[user, name].join('/')];
 

@@ -77,3 +77,9 @@ export const getAvatar = (user: string): Promise<string | null> => {
 		next();
 	});
 };
+
+export const fetchData = async (fetch: any, uri: string) => {
+	const res = await fetch(uri);
+	const data = await res.json();
+	return data;
+};

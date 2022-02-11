@@ -1,7 +1,12 @@
 <script context="module">
+	import { fetchData } from '$lib/util';
+
 	export const load = async ({ fetch }) => {
-		const ret = await fetch('/api/posts');
-		const { tags, categorys } = await ret.json();
+		const slug = JSON.stringify({
+			meta: true
+		});
+		const { tags, categorys } = await fetchData(fetch, `/api/posts-${slug}`);
+
 		return {
 			stuff: {
 				tags,
