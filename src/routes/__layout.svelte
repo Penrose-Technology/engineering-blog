@@ -2,10 +2,8 @@
 	import { fetchData } from '$lib/util';
 
 	export const load = async ({ fetch }) => {
-		const slug = JSON.stringify({
-			meta: true
-		});
-		const { tags, categorys } = await fetchData(fetch, `/api/posts-${slug}`);
+		const slug = { meta: true };
+		const { tags, categorys } = await fetchData(fetch, `/api/posts`, slug);
 
 		return {
 			stuff: {

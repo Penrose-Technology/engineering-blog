@@ -4,15 +4,12 @@
 
 	export const load = async ({ url, fetch }) => {
 		const [user, name] = new URL(url).pathname.split('/').slice(-2).map(decodeURIComponent);
-		const slug = JSON.stringify({ user, detail: true, name });
-
-		const { users, times } = await fetchData(fetch, `/api/posts-${slug}`);
-		const time = times[[user, name].join('/')];
+		const slug = { user, detail: true, name };
+		const { post, time } = await fetchData(fetch, '/api/posts', slug);
 
 		return {
 			props: {
-				user,
-				...users[user],
+				post,
 				...time
 			}
 		};
@@ -21,29 +18,28 @@
 
 <script lang="ts">
 	import { formatDate } from '$lib/util';
+	import type { Post } from '$lib/post';
 
-	export let user: string;
-	export let avatar: string;
-	export let min: number;
+	export let post: Post;
 	export let updated_at: number;
 </script>
 
 <div class="flex items-center">
-	<a href="/user/{user}" class="hover:opacity-75 transition-opacity">
-		{#if avatar}
-			<img src={avatar} class="w-12 h-12 rounded-full" alt="avatar" />
+	<a href="/user/{post.u}" class="hover:opacity-75 transition-opacity">
+		{#if post.avatar}
+			<img src={post.avatar} class="w-12 h-12 rounded-full" alt="avatar" />
 		{:else}
 			<div class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center">
-				{user[0].toUpperCase()}
+				{post.u[0].toUpperCase()}
 			</div>
 		{/if}
 	</a>
 	<div class="ml-2">
-		<a href="/user/{user}" class="hover:underline">{user}</a>
+		<a href="/user/{post.u}" class="hover:underline">{post.u}</a>
 		<div class="flex items-center">
 			<span class="text-sm opacity-75">{formatDate(updated_at)}</span>
 			<i class="iconfont icon-dot text-xs font-semibold" />
-			<span class="text-sm opacity-75">{min} min read</span>
+			<span class="text-sm opacity-75">{post.min} min read</span>
 		</div>
 	</div>
 </div>
