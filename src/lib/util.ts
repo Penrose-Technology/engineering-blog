@@ -78,7 +78,15 @@ export const getAvatar = (user: string): Promise<string | null> => {
 	});
 };
 
-export const fetchData = async (fetch: any, uri: string) => {
+export const fetchData = async (
+	fetch: any,
+	uri: string,
+	slug?: Record<string, string | number | boolean>
+) => {
+	if (slug) {
+		uri = `${uri}-${JSON.stringify(slug)}`;
+	}
+
 	const res = await fetch(uri);
 	const data = await res.json();
 	return data;

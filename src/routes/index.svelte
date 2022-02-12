@@ -5,12 +5,9 @@
 
 	export const load = async ({ fetch, url }) => {
 		const params = getPageParamsFromUrl(new URL(url));
-		const slug = JSON.stringify({
-			list: 'all',
-			...params
-		});
+		const slug = { list: 'all', ...params };
 
-		const data = await fetchData(fetch, `/api/posts-${slug}`);
+		const data = await fetchData(fetch, `/api/posts`, slug);
 
 		return {
 			props: data

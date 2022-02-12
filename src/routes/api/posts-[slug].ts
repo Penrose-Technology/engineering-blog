@@ -20,28 +20,23 @@ export const get = async ({ params }) => {
 	delete body.files;
 
 	if (detail) {
-		delete body.categorys;
-		delete body.tags;
 		delete body.total;
-		delete body.list;
 
 		const time_key = [user, name].join('/');
-		times = { [time_key]: times[time_key] };
-		body.users = { [user]: body.users[user] };
+		const time = times[time_key];
+
+		const post = body.list.find((item) => item.u === user);
 
 		return {
 			body: {
 				...body,
-				times
+				post,
+				time
 			}
 		};
 	}
 
 	if (list) {
-		delete body.categorys;
-		delete body.tags;
-		delete body.users;
-
 		if (list === 'category') {
 			// filter
 			body.list = body.list.filter((item) => item.category.includes(category));
@@ -75,7 +70,29 @@ export const get = async ({ params }) => {
 			body
 		};
 	} else if (meta) {
-		const { categorys, tags } = body;
+		const { categorys, tags } = body.list.reduce(
+			(prev, cur) => {
+				if (cur.category) {
+					for (const cate of cur.category) {
+						if (!prev.categorys.includes(cate)) {
+							prev.categorys = [...prev.categorys, cate];
+						}
+					}
+				}
+
+				if (cur.tags) {
+					for (const tag of cur.tags) {
+						if (!prev.tags.includes(tag)) {
+							prev.tags = [...prev.tags, tag];
+						}
+					}
+				}
+
+				return { ...prev };
+			},
+			{ categorys: [], tags: [] }
+		);
+
 		return {
 			body: {
 				categorys,
